@@ -1,27 +1,68 @@
-# N queens
+#!/usr/bin/python3
+"""
+Solution to the nqueens problem
+"""
+import sys
 
-The N queens puzzle is a challenge of placing N non-attacking queens on an NxN chessboard.
 
-On a chessboard, the queen can move any number of squares vertically, horizontally
-or diagonally.Thus, to solve the puzzle, each queen must be placed on its own
-row, column and diagonal.
+def backtrack(r, n, cols, pos, neg, board):
+    """
+    backtrack function to find solution
+    """
+    if r == n:
+        res = []
+        for l in range(len(board)):
+            for k in range(len(board[l])):
+                if board[l][k] == 1:
+                    res.append([l, k])
+        print(res)
+        return
 
-This is most efficiently solved using a backtracking algorithm. Backtracking is
-a general algorithm for finding solutions to some computational problems that
-incrementally builds candidates to the solutions, and abandons a candidate i.e.,
-backtracks as soon as it determines that the candidate cannot possibly be completed
-to a valid solution.
+    for c in range(n):
+        if c in cols or (r + c) in pos or (r - c) in neg:
+            continue
 
-## Usage
+        cols.add(c)
+        pos.add(r + c)
+        neg.add(r - c)
+        board[r][c] = 1
 
-```nqueens N```
-where N is the number of queens.
-      - N must be an integer greater or equal to 4
-      - the program prints every possible solution to the problem in the format
-        shown below
-```
-$ ./0-nqueens 4
-[[0, 1], [1, 3], [2, 0], [3, 2]]
-[[0, 2], [1, 0], [2, 3], [3, 1]]
-```
-Each inner list represents the coordinates of a queen in the NxN chessboard.
+        backtrack(r+1, n, cols, pos, neg, board)
+
+        cols.remove(c)
+        pos.remove(r + c)
+        neg.remove(r - c)
+        board[r][c] = 0
+
+
+def nqueens(n):
+    """
+    Solution to nqueens problem
+    Args:
+        n (int): number of queens. Must be >= 4
+    Return:
+        List of lists representing coordinates of each
+        queen for all possible solutions
+    """
+    cols = set()
+    pos_diag = set()
+    neg_diag = set()
+    board = [[0] * n for i in range(n)]
+
+    backtrack(0, n, cols, pos_diag, neg_diag, board)
+
+
+if __name__ == "__main__":
+    n = sys.argv
+    if len(n) != 2:
+        print("Usage: nqueens N")
+        sys.exit(1)
+    try:
+        nn = int(n[1])
+        if nn < 4:
+            print("N must be at least 4")
+            sys.exit(1)
+        nqueens(nn)
+    except ValueError:
+        print("N must be a number")
+        sys.exit(1)
